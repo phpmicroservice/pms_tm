@@ -129,6 +129,12 @@ $di->setShared('logger', function () {
     return $logger;
 });
 
+$di->set(
+    "proxyCS", function () {
+    $client = new \pms\bear\ClientSync(get_env('PROXY_HOST'), get_env('PROXY_PROT'), 10);
+    return $client;
+
+});
 
 /**
  * Database connection is created based in the parameters defined in the

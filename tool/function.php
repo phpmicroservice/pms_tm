@@ -6,8 +6,8 @@ function dump()
     if (!APP_DEBUG)
         return false;
 // $argsNum = func_num_args(); //获取参数个数
-    $args     = func_get_args();
-    $timeArr  = explode(' ', microtime());
+    $args = func_get_args();
+    $timeArr = explode(' ', microtime());
     $debugArr = debug_backtrace();
     echo "<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />";
     echo "<pre  style='color:red'><hr><hr>【调用文件】:", $debugArr [0] ['file'], '<br/>【调用行号】:', $debugArr [0] ['line'], '<br/>';
@@ -21,7 +21,18 @@ function dump()
     echo '<hr></pre>';
 }
 
-
+/**
+ * 浮点数的属技术
+ * @param int $min 最小值
+ * @param int $max 最大值
+ * @param int $mul 除数
+ * @return float 成功返回float,失败报异常
+ */
+function f_rand($min = 0, $max = 1, $mul = 1000000): float
+{
+    if ($min > $max) return 0.0;
+    return mt_rand($min * $mul, $max * $mul) / $mul;
+}
 
 
 /**
@@ -29,7 +40,7 @@ function dump()
  * @param int $num
  * @return array|mixed
  */
-function debug_24($num=-1)
+function debug_24($num = -1)
 {
     $arr = [];
     $debug = debug_backtrace();
@@ -52,7 +63,7 @@ function debug_24($num=-1)
         }
         $arr[] = $vattt;
     }
-    if($num>-1){
+    if ($num > -1) {
         return $arr[$num];
     }
     return $arr;
@@ -82,7 +93,8 @@ function func_get_args222($data)
     return $data;
 }
 
-function prrr(){
+function prrr()
+{
     return json_encode(func_get_args());
 }
 
@@ -92,13 +104,14 @@ function prrr(){
  * @param int $number
  * @return bool
  */
-function prn($val,$number=1){
+function prn($val, $number = 1)
+{
 
     if (!\APP_DEBUG) {
         return false;
     }
 
-    static $arfr=0;
+    static $arfr = 0;
     $arfr++;
 // $argsNum = func_num_args(); //获取参数个数
     $args = $val;
@@ -111,10 +124,10 @@ function prn($val,$number=1){
         $getType = gettype($v);
         if ($getType == 'object') {
             echo '【变量序号】:', $k + 1, '<br/>【变量类型】:', $getType, ' 仅仅输出了公开属性<br/>';
-            $string= print_r($v,true);
+            $string = print_r($v, true);
 
-            echo substr($string,0,50) .'<br/><br/><br/>';;
-            $v1=get_object_vars($v);
+            echo substr($string, 0, 50) . '<br/><br/><br/>';;
+            $v1 = get_object_vars($v);
             var_dump($v1);
 
         } else {
@@ -125,7 +138,7 @@ function prn($val,$number=1){
 
     }
     echo '<hr></pre>';
-    if($arfr>$number){
+    if ($arfr > $number) {
         exit;
     }
 
@@ -160,7 +173,7 @@ function pre()
 
 
             echo $string . '<br/><br/><br/>';;
-            $v1=get_object_vars($v);
+            $v1 = get_object_vars($v);
             var_dump($v1);
 
         } else {
@@ -186,8 +199,8 @@ function pre2()
     }
 
 // $argsNum = func_num_args(); //获取参数个数
-    $args     = func_get_args();
-    $timeArr  = explode(' ', microtime());
+    $args = func_get_args();
+    $timeArr = explode(' ', microtime());
     $debugArr = debug_backtrace();
     echo "<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />";
     echo "<pre  style='color:red'><hr><hr>【调用文件】:", RUN_UNIQID . ' ', $debugArr [0] ['file'], '<br/>【调用行号】:', $debugArr [0] ['line'], '<br/>';
@@ -241,8 +254,8 @@ function pr()
     if (!APP_DEBUG)
         return false;
 // $argsNum = func_num_args(); //获取参数个数
-    $args     = func_get_args();
-    $timeArr  = explode(' ', microtime());
+    $args = func_get_args();
+    $timeArr = explode(' ', microtime());
     $debugArr = debug_backtrace();
     echo "<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />";
     echo "<pre  style='color:red'><hr><hr>【调用文件】:", RUN_UNIQID . ' ', $debugArr [0] ['file'], '<br/>【调用行号】:', $debugArr [0] ['line'], '<br/>';
@@ -266,7 +279,7 @@ function prw()
     if (!APP_DEBUG) {
         return false;
     }
-    $args     = func_get_args();
+    $args = func_get_args();
     $debugArr = debug_backtrace();
 
     $filename = 'cbg.html';
@@ -274,7 +287,7 @@ function prw()
     if (is_string($args[count($args) - 1])) {
         $fileArr = explode('.html', $args[count($args) - 1]);
         if (2 == count($fileArr) && 0 == strlen($fileArr[1])) {
-            if (is_numeric($fileArr[0]) && (int) ($fileArr[0]) == $fileArr[0] && $fileArr[0] < 900) {
+            if (is_numeric($fileArr[0]) && (int)($fileArr[0]) == $fileArr[0] && $fileArr[0] < 900) {
                 $fileArr[0] += 1000;
                 $fileArr[0] = substr($fileArr[0], 1);
             }
@@ -283,15 +296,15 @@ function prw()
         }
     }
 
-    $timeArr  = explode(' ', microtime());
+    $timeArr = explode(' ', microtime());
     $debugArr = debug_backtrace();
-    $laststr  = "<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />";
-    $laststr  .= "<pre  style='color:red'>【调用文件】:" . $debugArr [0] ['file'] . '<br/>【调用行号】:' . $debugArr [0] ['line'] . '<br/>';
-    $laststr  .= '【调用时间】:' . date('Y-m-d H:i:s ', $timeArr[1]) . $timeArr[0] . '<hr/>';
+    $laststr = "<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />";
+    $laststr .= "<pre  style='color:red'>【调用文件】:" . $debugArr [0] ['file'] . '<br/>【调用行号】:' . $debugArr [0] ['line'] . '<br/>';
+    $laststr .= '【调用时间】:' . date('Y-m-d H:i:s ', $timeArr[1]) . $timeArr[0] . '<hr/>';
     foreach ($args as $k => $v) {
         $getType = gettype($v);
         $laststr .= '【变量序号】:' . ($k + 1) . '<br/>【变量类型】:' . $getType . '<br/>';
-        $laststr .= 'boolean' == $getType ? ( $v ? 'bool( true )' : 'bool( false )' ) : print_r($v, true);
+        $laststr .= 'boolean' == $getType ? ($v ? 'bool( true )' : 'bool( false )') : print_r($v, true);
         $laststr .= '<hr>';
     }
     $laststr .= '</pre>';
@@ -307,7 +320,7 @@ function praw()
 {
     if (!APP_DEBUG)
         return false;
-    $args     = func_get_args();
+    $args = func_get_args();
     $debugArr = debug_backtrace();
 
     $filename = 'cbg.html';
@@ -315,7 +328,7 @@ function praw()
     if (is_string($args[count($args) - 1])) {
         $fileArr = explode('.html', $args[count($args) - 1]);
         if (2 == count($fileArr) && 0 == strlen($fileArr[1])) {
-            if (is_numeric($fileArr[0]) && (int) ($fileArr[0]) == $fileArr[0] && $fileArr[0] < 900) {
+            if (is_numeric($fileArr[0]) && (int)($fileArr[0]) == $fileArr[0] && $fileArr[0] < 900) {
                 $fileArr[0] += 1000;
                 $fileArr[0] = substr($fileArr[0], 1);
             }
@@ -323,15 +336,15 @@ function praw()
             unset($args[count($args) - 1]);
         }
     }
-    $timeArr  = explode(' ', microtime());
+    $timeArr = explode(' ', microtime());
     $debugArr = debug_backtrace();
-    $laststr  = "<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />";
-    $laststr  .= "<pre  style='color:red'>【调用文件】:" . $debugArr [0] ['file'] . '<br/>【调用行号】:' . $debugArr [0] ['line'] . '<br/>';
-    $laststr  .= '【调用时间】:' . date('Y-m-d H:i:s ', $timeArr[1]) . $timeArr[0] . '<hr/>';
+    $laststr = "<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />";
+    $laststr .= "<pre  style='color:red'>【调用文件】:" . $debugArr [0] ['file'] . '<br/>【调用行号】:' . $debugArr [0] ['line'] . '<br/>';
+    $laststr .= '【调用时间】:' . date('Y-m-d H:i:s ', $timeArr[1]) . $timeArr[0] . '<hr/>';
     foreach ($args as $k => $v) {
         $getType = gettype($v);
         $laststr .= '【变量序号】:' . ($k + 1) . '<br/>【变量类型】:' . $getType . '<br/>';
-        $laststr .= 'boolean' == $getType ? ( $v ? 'bool( true )' : 'bool( false )' ) : print_r($v, true);
+        $laststr .= 'boolean' == $getType ? ($v ? 'bool( true )' : 'bool( false )') : print_r($v, true);
         $laststr .= '<hr>';
     }
     $laststr .= '</pre>';
@@ -346,7 +359,7 @@ function prew()
 {
     if (!APP_DEBUG)
         return false;
-    $args     = func_get_args();
+    $args = func_get_args();
     $debugArr = debug_backtrace();
 
     $filename = 'cbg.html';
@@ -354,7 +367,7 @@ function prew()
     if (is_string($args[count($args) - 1])) {
         $fileArr = explode('.html', $args[count($args) - 1]);
         if (2 == count($fileArr) && 0 == strlen($fileArr[1])) {
-            if (is_numeric($fileArr[0]) && (int) ($fileArr[0]) == $fileArr[0] && $fileArr[0] < 900) {
+            if (is_numeric($fileArr[0]) && (int)($fileArr[0]) == $fileArr[0] && $fileArr[0] < 900) {
                 $fileArr[0] += 1000;
                 $fileArr[0] = substr($fileArr[0], 1);
             }
@@ -362,21 +375,23 @@ function prew()
             unset($args[count($args) - 1]);
         }
     }
-    $timeArr  = explode(' ', microtime());
+    $timeArr = explode(' ', microtime());
     $debugArr = debug_backtrace();
-    $laststr  = "<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />";
-    $laststr  .= "<pre  style='color:red'>【调用文件】:" . $debugArr [0] ['file'] . '<br/>【调用行号】:' . $debugArr [0] ['line'] . '<br/>';
-    $laststr  .= '【调用时间】:' . date('Y-m-d H:i:s ', $timeArr[1]) . $timeArr[0] . '<hr/>';
+    $laststr = "<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />";
+    $laststr .= "<pre  style='color:red'>【调用文件】:" . $debugArr [0] ['file'] . '<br/>【调用行号】:' . $debugArr [0] ['line'] . '<br/>';
+    $laststr .= '【调用时间】:' . date('Y-m-d H:i:s ', $timeArr[1]) . $timeArr[0] . '<hr/>';
     foreach ($args as $k => $v) {
         $getType = gettype($v);
         $laststr .= '【变量序号】:' . ($k + 1) . '<br/>【变量类型】:' . $getType . '<br/>';
-        $laststr .= 'boolean' == $getType ? ( $v ? 'bool( true )' : 'bool( false )' ) : print_r($v, true);
+        $laststr .= 'boolean' == $getType ? ($v ? 'bool( true )' : 'bool( false )') : print_r($v, true);
         $laststr .= '<hr>';
     }
     $laststr .= '</pre>';
     file_put_contents($filename, $laststr);
     exit;
 }
-function svar(){
+
+function svar()
+{
     return json_encode(func_get_args());
 }

@@ -4,9 +4,6 @@ echo "开始主程序! \n";
 define("APP_SERVICE_NAME", "TM");# 设置服务名字
 define('ROOT_DIR', dirname(__DIR__));
 
-# 定义一些配置
-define('APP_DEBUG', false);
-
 require ROOT_DIR . '/vendor/autoload.php';
 # 进行一些项目配置
 define('APP_SECRET_KEY', get_env("APP_SECRET_KEY"));
@@ -30,8 +27,7 @@ $loader->register();
 
 $server = new \pms\Server('0.0.0.0', 9502, SWOOLE_BASE, SWOOLE_SOCK_TCP, [
     'daemonize' => false,
-    'task_worker_num' => 4,
-    'reactor_num' => 16,
+    'task_worker_num' => 16,
     'reload_async' => false,
     'open_eof_split' => true, //打开EOF检测
     'package_eof' => PACKAGE_EOF, //设置EOF

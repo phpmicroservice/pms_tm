@@ -3,7 +3,7 @@
 return [
 
     'config_init' => false,
-    'server_reg'=>false,
+    'server_reg' => true,
     'ready' => false,
     'session' => false,
     'codeUpdata' => [

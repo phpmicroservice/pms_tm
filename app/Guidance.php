@@ -32,8 +32,6 @@ class Guidance extends \Phalcon\Di\Injectable
     {
         output('beforeStart  beforeStart', 'beforeStart');
         # 写入依赖注入
-        
-        $this->server_table;
     }
 
     /**
@@ -51,6 +49,7 @@ class Guidance extends \Phalcon\Di\Injectable
         $this->eventsManager->attach('Server:readyJudge', $this);
         $this->eventsManager->attach('Server:readySucceed', $this);
         $this->eventsManager->attach('dispatch:beforeDispatch', $this);
+        $this->eventsManager->attach('dispatch:beforeDispatch', new Alc(), 1);
     }
 
     /**
@@ -82,12 +81,7 @@ class Guidance extends \Phalcon\Di\Injectable
      */
     public function readySucceed()
     {
-
-        # 对已注册的服务进行心跳检测
-        swoole_timer_tick($this->dConfig->overtime * 500, function ($timeid) {
-            $server = new \app\logic\Service();
-            $server->pingExamine();
-        });
+        output("readySucceed ");
     }
 
     /**
