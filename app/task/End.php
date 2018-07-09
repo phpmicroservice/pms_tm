@@ -32,9 +32,7 @@ class End extends Task implements TaskInterface
                 break;
             }
         }
-        var_dump($data);
-        var_dump($create_status);
-        return $create_status;
+        return $create_status === 3;
     }
 
     private function getGCache(): \Phalcon\Cache\BackendInterface
@@ -63,7 +61,7 @@ class End extends Task implements TaskInterface
         }
         # 已经完成就保存  事务状态信息
         if ($status_old === 2) {
-            $this->gCache->save($xid . '_status', $status1);
+            $gCache->save($xid . '_status', $status1);
         }
         $status_old = $gCache->get($xid . '_status');
         return (int)$status_old;

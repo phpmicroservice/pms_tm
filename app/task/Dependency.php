@@ -63,7 +63,7 @@ class Dependency extends Task implements TaskInterface
         }
         # 已经完成就保存  事务状态信息
         if ($status_old === 3) {
-            $this->gCache->save($xid . '_status', $status1);
+            $gCache->save($xid . '_status', $status1);
         }
         $status_old = $gCache->get($xid . '_status');
         return (int)$status_old;

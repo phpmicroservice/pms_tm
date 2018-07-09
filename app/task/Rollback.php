@@ -2,7 +2,6 @@
 
 namespace app\task;
 
-use pms\Output;
 use pms\Task\Task;
 use pms\Task\TaskInterface;
 
@@ -11,7 +10,7 @@ use pms\Task\TaskInterface;
  * @author Dongasai<1514582970@qq.com>
  *
  */
-class Prepare extends Task implements TaskInterface
+class Rollback extends Task implements TaskInterface
 {
     public function run()
     {
@@ -23,23 +22,19 @@ class Prepare extends Task implements TaskInterface
         $server_name = $data['name'];
         $gCache = $this->getGCache();
         $sub = $gCache->get($xid . '_sub');
-        $sub[$server_name] = 4;
+        $sub[$server_name] = -1;
         $gCache->save($xid . '_sub', $sub);
-        # 6秒没有依赖处理完成就是失败
-        for ($i = 0; $i < 12; $i++) {
-            usleep(mt_rand(400, 600));
-            $create_status = $this->monitor($xid);
-            if ($create_status === 4) {
-                break;
-            }
-        }
-        Output::debug([$data, $create_status], 'debug');
-        return $create_status === $create_status;
+        return false;
     }
 
     private function getGCache(): \Phalcon\Cache\BackendInterface
     {
         return \Phalcon\Di::getDefault()->get('gCache');
+    }
+
+    public function end()
+    {
+
     }
 
     /**
@@ -67,11 +62,6 @@ class Prepare extends Task implements TaskInterface
         }
         $status_old = $gCache->get($xid . '_status');
         return (int)$status_old;
-    }
-
-    public function end()
-    {
-
     }
 
 

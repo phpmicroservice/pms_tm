@@ -25,7 +25,7 @@ class Service extends \app\Controller
         $server = $this->getData('server');
         $tx_name = $this->getData('tx_name');
         $tx_data = $this->getData('tx_data');
-        $xid = uniqid(uniqid());
+        $xid = uniqid();
         $data = [
             'name' => $tx_name,
             'data' => $tx_data,
@@ -38,7 +38,9 @@ class Service extends \app\Controller
             'xid' => $xid,
             'data' => $data,
             'server' => $server
-        ]], -1);
+        ]], -1, function ($s, $wid, $re) {
+            output($re, '创建task执行结果');
+        });
 
     }
 
@@ -47,7 +49,19 @@ class Service extends \app\Controller
      */
     public function rollback()
     {
-
+        $xid = $this->getData('xid');
+        $name = $this->getData('name');
+        $connect = $this->connect;
+        $this->swoole_server->task(['rollback', [
+            'xid' => $xid,
+            'name' => $name
+        ]], -1, function (\swoole_server $serv, $task_id, $data) use ($connect) {
+            if ($data['re']) {
+                $connect->send_succee(true);
+            } else {
+                $connect->send_error('事务协调器不允许事务成功!');
+            }
+        });
     }
 
     /**
@@ -120,12 +134,12 @@ class Service extends \app\Controller
     {
         $xid = $this->getData('xid');
         $name = $this->getData('name');
-        $data = $this->getData('data');
+        $data125 = $this->getData('data');
         $connect = $this->connect;
         $this->swoole_server->task(['add', [
             'xid' => $xid,
             'name' => $name,
-            'data' => $data
+            'data' => $data125
         ]], -1, function (\swoole_server $server, $task_id, $data) use ($connect) {
             if ($data['re']) {
                 $connect->send_succee(true);
@@ -134,7 +148,7 @@ class Service extends \app\Controller
             }
         });
 
-        $this->call_yl($xid, $data);
+        $this->call_yl($xid, $data125);
     }
 
     /**
@@ -144,13 +158,20 @@ class Service extends \app\Controller
      */
     private function call_yl($xid, $data)
     {
+        var_dump(['call_yl', $xid, $data]);
         foreach ($data as $value) {
+            $data = [
+                'name' => $value['tx_name'],
+                'data' => $value['tx_data'],
+                'xid' => $xid
+            ];
             $this->swoole_server->task(['create', [
                 'xid' => $xid,
-                'data' => $value['tx_data'],
-                'name' => $value['tx_name'],
+                'data' => $data,
                 'server' => $value['server']
-            ]], -1);
+            ]], -1, function ($s, $wid, $re) {
+                output($re, '创建task执行结果');
+            });
         }
     }
 

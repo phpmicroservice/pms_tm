@@ -17,11 +17,18 @@ class Create extends Task implements TaskInterface
     public function run()
     {
         $data = $this->trueData['data']??$this->trueData[1];
+        $xid = $data['xid'];
         $server = $data['server'];
         $trdata = $data['data'];
         $proxyCS = $this->getProxyCS();
-        $re = $proxyCS->request($server, '/Transaction/create', $trdata);
+        $re = $proxyCS->request_return($server, '/transaction/create', $trdata);
         var_dump($re);
+        $gCache = $this->getGCache();
+        $sub = $gCache->get($xid . '_sub');
+        $sub[$server] = 1;
+        $gCache->save($xid . '_sub', $sub);
+
+        return $this->a();
     }
 
     private function getProxyCS(): ClientSync
@@ -30,13 +37,18 @@ class Create extends Task implements TaskInterface
 
     }
 
+    private function getGCache(): \Phalcon\Cache\BackendInterface
+    {
+        return \Phalcon\Di::getDefault()->get('gCache');
+    }
+
     public function a()
     {
         $data = $this->trueData['data']??$this->trueData[1];
         $xid = $data['xid'];
         $server_name = $data['name'];
         if (empty($xid)) {
-            return true;
+            return false;
         }
 
 
@@ -48,8 +60,8 @@ class Create extends Task implements TaskInterface
                 break;
             }
         }
-        var_dump($data);
-        var_dump($create_status);
+
+        output([$create_status], 'create-task-a');
         return $create_status;
     }
 
@@ -71,15 +83,10 @@ class Create extends Task implements TaskInterface
         }
         # 已经完成就保存  事务状态信息
         if ($status_old !== $status1) {
-            $this->gCache->save($xid . '_status', $status1);
+            $gCache->save($xid . '_status', $status1);
         }
         $status_old = $gCache->get($xid . '_status');
         return (int)$status_old;
-    }
-
-    private function getGCache(): \Phalcon\Cache\BackendInterface
-    {
-        return \Phalcon\Di::getDefault()->get('gCache');
     }
 
     public function end()
