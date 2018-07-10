@@ -2,6 +2,7 @@
 
 namespace app\controller;
 
+use app\validation\GCreate;
 use pms\bear\Counnect;
 
 /**
@@ -22,9 +23,19 @@ class Service extends \app\Controller
      */
     public function create()
     {
+
         $server = $this->getData('server');
         $tx_name = $this->getData('tx_name');
         $tx_data = $this->getData('tx_data');
+        $vadata = [
+            'server' => $server,
+            'tx_name' => $tx_name,
+            'tx_data' => $tx_data
+        ];
+        $va = new GCreate();
+        if (!$va->validate($vadata)) {
+            return $this->connect->send_error($va->getErrorMessages());
+        }
         $xid = uniqid();
         $data = [
             'name' => $tx_name,
@@ -70,19 +81,20 @@ class Service extends \app\Controller
     public function prepare()
     {
         $xid = $this->getData('xid');
-        $name = $this->getData('name');
+        $server_name = $this->getData('server');
         $connect = $this->connect;
         $this->swoole_server->task(['prepare', [
             'xid' => $xid,
-            'name' => $name
+            'server_name' => $server_name
         ]], -1, function (\swoole_server $serv, $task_id, $data) use ($connect) {
             if ($data['re']) {
                 $connect->send_succee(true);
             } else {
-                $connect->send_error('超时');
+                $connect->send_error('超时prepare');
             }
         });
     }
+
 
     /**
      * 事务准备完成
@@ -91,11 +103,11 @@ class Service extends \app\Controller
     public function end()
     {
         $xid = $this->getData('xid');
-        $name = $this->getData('name');
+        $server_name = $this->getData('server');
         $connect = $this->connect;
         $this->swoole_server->task(['end', [
             'xid' => $xid,
-            'name' => $name
+            'server_name' => $server_name
         ]], -1, function (\swoole_server $serv, $task_id, $data) use ($connect) {
             if ($data['re']) {
                 $connect->send_succee(true);
@@ -113,11 +125,11 @@ class Service extends \app\Controller
     public function commit()
     {
         $xid = $this->getData('xid');
-        $name = $this->getData('name');
+        $server_name = $this->getData('server');
         $connect = $this->connect;
         $this->swoole_server->task(['commit', [
             'xid' => $xid,
-            'name' => $name
+            'server_name' => $server_name
         ]], -1, function (\swoole_server $serv, $task_id, $data) use ($connect) {
             if ($data['re']) {
                 $connect->send_succee(true);
@@ -132,13 +144,17 @@ class Service extends \app\Controller
      */
     public function add()
     {
+        $this->logger->info('controller-add' . var_export($this->getData(), true));
         $xid = $this->getData('xid');
-        $name = $this->getData('name');
+        $server = $this->getData('server');
         $data125 = $this->getData('data');
+        # 处理依赖
+        $this->call_yl($xid, $data125);
         $connect = $this->connect;
+        # 监测依赖处理
         $this->swoole_server->task(['add', [
             'xid' => $xid,
-            'name' => $name,
+            'server' => $server,
             'data' => $data125
         ]], -1, function (\swoole_server $server, $task_id, $data) use ($connect) {
             if ($data['re']) {
@@ -148,7 +164,7 @@ class Service extends \app\Controller
             }
         });
 
-        $this->call_yl($xid, $data125);
+
     }
 
     /**
@@ -158,7 +174,7 @@ class Service extends \app\Controller
      */
     private function call_yl($xid, $data)
     {
-        var_dump(['call_yl', $xid, $data]);
+        $this->logger->info('call_yl' . var_export([$xid, $data], true));
         foreach ($data as $value) {
             $data = [
                 'name' => $value['tx_name'],
@@ -181,11 +197,11 @@ class Service extends \app\Controller
     public function dependency()
     {
         $xid = $this->getData('xid');
-        $name = $this->getData('name');
+        $server_name = $this->getData('server');
         $connect = $this->connect;
         $this->swoole_server->task(['dependency', [
             'xid' => $xid,
-            'name' => $name
+            'server_name' => $server_name
         ]], -1, function (\swoole_server $serv, $task_id, $data) use ($connect) {
             if ($data['re']) {
                 $connect->send_succee(true);

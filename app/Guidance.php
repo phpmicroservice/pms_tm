@@ -42,6 +42,7 @@ class Guidance extends \Phalcon\Di\Injectable
      */
     public function onWorkerStart(Event $event, \pms\Server $pms_server, \Swoole\Server $server)
     {
+        include_once ROOT_DIR . '/tool/function.php';
         output($server->taskworker, 'guidance');
         # 绑定一个权限验证
         $this->eventsManager->attach('Router:handleCall', $this);

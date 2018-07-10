@@ -9,8 +9,9 @@
 > -1 事务回滚
 > 1 add -> 创建依赖中 ->dependency \
 > 2 dependency -> 构建中 ->end \
-> 3 end->预提交 \
-> 4 提交 \
-> 5 完成
+> 3 end->结束 ->Prepare\
+> 4 Prepare->预提交 \
+> 5 提交 \
+> 6 完成
 
 

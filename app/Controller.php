@@ -9,7 +9,7 @@ namespace app;
  * @property \Phalcon\Cache\BackendInterface $gCache
  * @property \Phalcon\Config $dConfig
  * @property \pms\bear\ClientSync $proxyCS
- *
+ * @property \Phalcon\Logger\AdapterInterface $logger
  * @package app\controller
  */
 class Controller extends \pms\Controller

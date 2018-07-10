@@ -7,40 +7,40 @@ use pms\Task\Task;
 use pms\Task\TaskInterface;
 
 /**
- * 依赖处理完成的任务类 3 -> 4
+ * 依赖处理完成的任务类 4 -> 5 prepare
  * @author Dongasai<1514582970@qq.com>
  *
  */
-class Prepare extends Task implements TaskInterface
+class Prepare extends TaskBase implements TaskInterface
 {
     public function run()
     {
+
+        $logger = $this->getLogger();
+        $logger->info('task-prepare-start' . var_export($this->trueData, true));
         $data = $this->trueData['data']??$this->trueData[1];
         $xid = $data['xid'];
         if (empty($xid)) {
             return true;
         }
-        $server_name = $data['name'];
+        $server_name = $data['server_name'];
         $gCache = $this->getGCache();
         $sub = $gCache->get($xid . '_sub');
-        $sub[$server_name] = 4;
+        $sub[$server_name] = 5;
         $gCache->save($xid . '_sub', $sub);
-        # 6秒没有依赖处理完成就是失败
-        for ($i = 0; $i < 12; $i++) {
-            usleep(mt_rand(400, 600));
+        # 4 秒没有依赖处理完成就是失败
+        for ($i = 0; $i < 4; $i++) {
             $create_status = $this->monitor($xid);
-            if ($create_status === 4) {
+            if ($create_status === 5) {
                 break;
             }
+            sleep(1);;
         }
-        Output::debug([$data, $create_status], 'debug');
-        return $create_status === $create_status;
+        $logger->info('task-prepare-return' . var_export([$create_status, $gCache->get($xid . '_sub')], true));
+        return $create_status === 5;
     }
 
-    private function getGCache(): \Phalcon\Cache\BackendInterface
-    {
-        return \Phalcon\Di::getDefault()->get('gCache');
-    }
+
 
     /**
      * 监测是否创建成功!
@@ -53,21 +53,22 @@ class Prepare extends Task implements TaskInterface
         $status_old = $gCache->get($xid . '_status');
         $sub = $gCache->get($xid . '_sub');
         # 判断其他的 服务依赖是否完成
-        $status1 = 4;
+        $status1 = 5;
         foreach ($sub as $name => $status) {
-            if ($status === 4) {
+            if ($status >= 5) {
                 # 已经进入到构建阶段
             } else {
-                $status1 = 3;
+                $status1 = 4;
             }
         }
         # 已经完成就保存  事务状态信息
-        if ($status_old === 4) {
-            $gCache->save($xid . '_status', $status1);
+        if ($status1 === 5) {
+            $gCache->save($xid . '_status', 5);
         }
         $status_old = $gCache->get($xid . '_status');
         return (int)$status_old;
     }
+
 
     public function end()
     {

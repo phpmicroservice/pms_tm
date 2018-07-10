@@ -22,7 +22,7 @@ function dump()
 }
 
 /**
- * 浮点数的属技术
+ * 浮点数的 随机数
  * @param int $min 最小值
  * @param int $max 最大值
  * @param int $mul 除数

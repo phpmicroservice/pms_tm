@@ -125,7 +125,11 @@ $di->set(
 
 
 $di->setShared('logger', function () {
-    $logger = new \pms\Logger\Adapter\MysqlLog('log');
+    defined('LOG_DIR') || define('LOG_DIR', RUNTIME_DIR . 'log/');
+    if (!is_dir(LOG_DIR . date('Ymd'))) {
+        mkdir(LOG_DIR . date('Ymd'));
+    }
+    $logger = new \Phalcon\Logger\Adapter\File(LOG_DIR . date('Ymd/Hi') . '.log');
     return $logger;
 });
 
