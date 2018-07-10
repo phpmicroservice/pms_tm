@@ -28,12 +28,12 @@ class Dependency extends TaskBase implements TaskInterface
         $sub[$server_name] = 3;
         $gCache->save($xid . '_sub', $sub);
         # 4 秒没有依赖处理完成就是失败
-        for ($i = 0; $i < 4; $i++) {
+        for ($i = 0; $i < 20; $i++) {
             $now_status = $this->monitor($xid);
             if ($now_status === 3) {
                 break;
             }
-            sleep(1);
+            usleep(200000);
         }
         $logger->info('task-dependency-return ' . var_export([
                 $now_status,

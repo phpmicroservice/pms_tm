@@ -29,12 +29,12 @@ class Prepare extends TaskBase implements TaskInterface
         $sub[$server_name] = 5;
         $gCache->save($xid . '_sub', $sub);
         # 4 秒没有依赖处理完成就是失败
-        for ($i = 0; $i < 4; $i++) {
+        for ($i = 0; $i < 20; $i++) {
             $create_status = $this->monitor($xid);
             if ($create_status === 5) {
                 break;
             }
-            sleep(1);;
+            usleep(200000);;
         }
         $logger->info('task-prepare-return' . var_export([$create_status, $gCache->get($xid . '_sub')], true));
         return $create_status === 5;

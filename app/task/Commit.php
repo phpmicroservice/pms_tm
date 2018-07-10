@@ -27,12 +27,12 @@ class Commit extends TaskBase implements TaskInterface
         $sub[$server_name] = 6;
         $gCache->save($xid . '_sub', $sub);
         # 4秒没有依赖处理完成就是失败
-        for ($i = 0; $i < 4; $i++) {
+        for ($i = 0; $i < 20; $i++) {
             $create_status = $this->monitor($xid);
             if ($create_status === 6) {
                 break;
             }
-            sleep(1);
+            usleep(200000);
         }
         $logger->info('task-commit-return' . var_export($create_status === 6, true));
         return $create_status === 6;

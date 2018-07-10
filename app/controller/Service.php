@@ -25,34 +25,12 @@ class Service extends \app\Controller
     {
 
         $server = $this->getData('server');
-        $tx_name = $this->getData('tx_name');
-        $tx_data = $this->getData('tx_data');
-        $vadata = [
-            'server' => $server,
-            'tx_name' => $tx_name,
-            'tx_data' => $tx_data
-        ];
-        $va = new GCreate();
-        if (!$va->validate($vadata)) {
-            return $this->connect->send_error($va->getErrorMessages());
-        }
         $xid = uniqid();
-        $data = [
-            'name' => $tx_name,
-            'data' => $tx_data,
-            'xid' => $xid
-        ];
-        $connect = $this->connect;
         $this->gCache->save($xid . '_status', 0);
         $this->gCache->save($xid . '_sub', [$server => 0]);
-        $this->swoole_server->task(['create', [
-            'xid' => $xid,
-            'data' => $data,
-            'server' => $server
-        ]], -1, function ($s, $wid, $re) {
-            output($re, '创建task执行结果');
-        });
-
+        $this->connect->send_succee([
+            'xid' => $xid
+        ]);
     }
 
     /**

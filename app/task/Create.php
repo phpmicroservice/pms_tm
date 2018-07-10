@@ -54,12 +54,12 @@ class Create extends TaskBase implements TaskInterface
         }
 
         # 4秒其他的依赖没有处理完成就是失败
-        for ($i = 0; $i < 4; $i++) {
+        for ($i = 0; $i < 20; $i++) {
             $create_status = $this->monitor($xid);
             if ($create_status === 1) {
                 break;
             }
-            sleep(1);
+            usleep(200000);
         }
         $gCache = $this->getGCache();
         $sub = $gCache->get($xid . '_sub');
