@@ -15,7 +15,7 @@ class Add extends TaskBase implements TaskInterface
     public function run()
     {
         $logger = $this->getLogger();
-        $logger->info('task-add-start: ' . var_export($this->trueData, true));
+        $logger->info(microtime(true) . ' task-add-start: ' . var_export($this->trueData, true));
         $data = $this->trueData['data']??$this->trueData[1];
         $xid = $data['xid'];
         if (empty($xid)) {
@@ -27,15 +27,15 @@ class Add extends TaskBase implements TaskInterface
         $sub[$server_name] = 2;
         $gCache->save($xid . '_sub', $sub);
         # 4 秒没有 处理完成就是失败
-        for ($i = 0; $i < 20; $i++) {
+        for ($i = 0; $i < 10; $i++) {
             $create_status = $this->monitor($xid);
             if ($create_status === 2) {
-                $logger->info('task-add:成功');
+                $logger->info(' task-add:成功');
                 break;
             }
-            usleep(200000);
+            usleep(100000 * $i);
         }
-        $logger->info('task-add-return : ' . var_export([
+        $logger->info(microtime(true) . ' task-add-return : ' . var_export([
                 $create_status,
                 $gCache->get($xid . '_sub')
             ], true));

@@ -15,7 +15,7 @@ class Dependency extends TaskBase implements TaskInterface
     public function run()
     {
         $logger = $this->getLogger();
-        $logger->info('task-dependency-start' . var_export($this->trueData, true));
+        $logger->info(microtime(true) . ' task-dependency-start' . var_export($this->trueData, true));
 
         $data = $this->trueData['data']??$this->trueData[1];
         $xid = $data['xid'];
@@ -28,14 +28,14 @@ class Dependency extends TaskBase implements TaskInterface
         $sub[$server_name] = 3;
         $gCache->save($xid . '_sub', $sub);
         # 4 秒没有依赖处理完成就是失败
-        for ($i = 0; $i < 20; $i++) {
+        for ($i = 0; $i < 10; $i++) {
             $now_status = $this->monitor($xid);
             if ($now_status === 3) {
                 break;
             }
-            usleep(200000);
+            usleep(100000 * $i);
         }
-        $logger->info('task-dependency-return ' . var_export([
+        $logger->info(microtime(true) . ' task-dependency-return ' . var_export([
                 $now_status,
                 $gCache->get($xid . '_sub')
             ], true));

@@ -27,7 +27,7 @@ class Service extends \app\Controller
         $server = $this->getData('server');
         $xid = uniqid();
         $this->gCache->save($xid . '_status', 0);
-        $this->gCache->save($xid . '_sub', [$server => 0]);
+        $this->gCache->save($xid . '_sub', [$server => 1]);
         $this->connect->send_succee([
             'xid' => $xid
         ]);

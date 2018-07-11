@@ -17,10 +17,10 @@ class TaskBase extends Task
         $data = $this->trueData['data']??$this->trueData[1];
         $xid = $data['xid'];
         defined('LOG_DIR') || define('LOG_DIR', RUNTIME_DIR . 'log/');
-        if (!is_dir(LOG_DIR . date('Ymd'))) {
-            mkdir(LOG_DIR . date('Ymd'));
+        if (!is_dir(LOG_DIR . date('Ymd/H/i/'))) {
+            mkdir(LOG_DIR . date('Ymd/H/i/'), 777, true);
         }
-        $logger = new \Phalcon\Logger\Adapter\File(LOG_DIR . date('Ymd/') . $xid . '.log');
+        $logger = new \Phalcon\Logger\Adapter\File(LOG_DIR . date('Ymd/H/i/') . $xid . '.log');
         return $logger;
     }
 }

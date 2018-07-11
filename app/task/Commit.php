@@ -12,10 +12,11 @@ use pms\Task\TaskInterface;
  */
 class Commit extends TaskBase implements TaskInterface
 {
+
     public function run()
     {
         $logger = $this->getLogger();
-        $logger->info('task-commit-start' . var_export($this->trueData, true));
+        $logger->info(microtime(true) . ' task-commit-start' . var_export($this->trueData, true));
         $data = $this->trueData['data']??$this->trueData[1];
         $xid = $data['xid'];
         if (empty($xid)) {
@@ -27,14 +28,14 @@ class Commit extends TaskBase implements TaskInterface
         $sub[$server_name] = 6;
         $gCache->save($xid . '_sub', $sub);
         # 4秒没有依赖处理完成就是失败
-        for ($i = 0; $i < 20; $i++) {
+        for ($i = 0; $i < 10; $i++) {
             $create_status = $this->monitor($xid);
             if ($create_status === 6) {
                 break;
             }
-            usleep(200000);
+            usleep(100000 * $i);
         }
-        $logger->info('task-commit-return' . var_export($create_status === 6, true));
+        $logger->info(microtime(true) . ' task-commit-return' . var_export($create_status === 6, true));
         return $create_status === 6;
     }
 

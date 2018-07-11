@@ -17,7 +17,7 @@ class Create extends TaskBase implements TaskInterface
     public function run()
     {
         $logger = $this->getLogger();
-        $logger->info('task-create-start' . var_export($this->trueData, true));
+        $logger->info(microtime(true) . ' task-create-start' . var_export($this->trueData, true));
         $data = $this->trueData['data']??$this->trueData[1];
         $xid = $data['xid'];
         $server = $data['server'];
@@ -25,7 +25,7 @@ class Create extends TaskBase implements TaskInterface
         $proxyCS = $this->getProxyCS();
         $re = $proxyCS->request_return($server, '/transaction/create', $trdata);
         var_dump($re);
-        $logger->info('task-create-request_return' . var_export([$trdata, $re], true));
+        $logger->info(' task-create-request_return' . var_export([$trdata, $re], true));
         $gCache = $this->getGCache();
         $sub = $gCache->get($xid . '_sub');
         $sub[$server] = 1;
@@ -54,17 +54,17 @@ class Create extends TaskBase implements TaskInterface
         }
 
         # 4秒其他的依赖没有处理完成就是失败
-        for ($i = 0; $i < 20; $i++) {
+        for ($i = 0; $i < 10; $i++) {
             $create_status = $this->monitor($xid);
             if ($create_status === 1) {
                 break;
             }
-            usleep(200000);
+            usleep(100000 * $i);
         }
         $gCache = $this->getGCache();
         $sub = $gCache->get($xid . '_sub');
-        $logger->info('task-create-sub' . var_export($sub, true));
-        $logger->info('task-create-return' . var_export($create_status === 1, true));
+        $logger->info(' task-create-sub' . var_export($sub, true));
+        $logger->info(microtime(true) . ' task-create-return' . var_export($create_status === 1, true));
         return $create_status === 1;
     }
 
