@@ -22,15 +22,15 @@ class Commit extends TaskBase implements TaskInterface
         if (empty($xid)) {
             return true;
         }
-        $server_name = $data['server_name'];
+        $server_name = strtolower($data['server_name']);
         $gCache = $this->getGCache();
         $sub = $gCache->get($xid . '_sub');
         $sub[$server_name] = 6;
         $gCache->save($xid . '_sub', $sub);
         # 4秒没有依赖处理完成就是失败
         for ($i = 0; $i < 10; $i++) {
-            $create_status = $this->monitor($xid);
-            if ($create_status === 6) {
+            $create_status = $this->monitor2($xid, 6);
+            if ($create_status === 6 || $create_status === -1) {
                 break;
             }
             usleep(100000 * $i);
@@ -39,6 +39,10 @@ class Commit extends TaskBase implements TaskInterface
         return $create_status === 6;
     }
 
+    public function end()
+    {
+
+    }
 
     /**
      * 监测是否创建成功!
@@ -65,12 +69,6 @@ class Commit extends TaskBase implements TaskInterface
         }
         $status_old = $gCache->get($xid . '_status');
         return (int)$status_old;
-    }
-
-
-    public function end()
-    {
-
     }
 
 

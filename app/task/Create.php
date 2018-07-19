@@ -16,19 +16,31 @@ class Create extends TaskBase implements TaskInterface
 
     public function run()
     {
+        $gCache = $this->getGCache();
         $logger = $this->getLogger();
         $logger->info(microtime(true) . ' task-create-start' . var_export($this->trueData, true));
-        $data = $this->trueData['data']??$this->trueData[1];
+        $data = $this->trueData['data'] ?? $this->trueData[1];
         $xid = $data['xid'];
-        $server = $data['server'];
+        $server = strtolower($data['server']);
         $trdata = $data['data'];
+
+        # 创建
         $proxyCS = $this->getProxyCS();
         $re = $proxyCS->request_return($server, '/transaction/create', $trdata);
         var_dump($re);
         $logger->info(' task-create-request_return' . var_export([$trdata, $re], true));
-        $gCache = $this->getGCache();
+        if ($re['e']) {
+            # 失败
+            $status = -1;
+            $this->add_message($xid, $server, 'create', $re['m'], $re['e']);
+
+        } else {
+            # 成功
+            $status = 1;
+        }
+
         $sub = $gCache->get($xid . '_sub');
-        $sub[$server] = 1;
+        $sub[$server] = $status;
         $gCache->save($xid . '_sub', $sub);
 
         return $this->a();
@@ -39,7 +51,6 @@ class Create extends TaskBase implements TaskInterface
         return \Phalcon\Di::getDefault()->get('proxyCS');
 
     }
-
 
 
     public function a()
@@ -55,10 +66,11 @@ class Create extends TaskBase implements TaskInterface
 
         # 4秒其他的依赖没有处理完成就是失败
         for ($i = 0; $i < 10; $i++) {
-            $create_status = $this->monitor($xid);
-            if ($create_status === 1) {
+            $create_status = $this->monitor2($xid, 1);
+            if ($create_status === 1 || $create_status === -1) {
                 break;
             }
+
             usleep(100000 * $i);
         }
         $gCache = $this->getGCache();
@@ -66,6 +78,11 @@ class Create extends TaskBase implements TaskInterface
         $logger->info(' task-create-sub' . var_export($sub, true));
         $logger->info(microtime(true) . ' task-create-return' . var_export($create_status === 1, true));
         return $create_status === 1;
+    }
+
+    public function end()
+    {
+
     }
 
     /**
@@ -92,12 +109,6 @@ class Create extends TaskBase implements TaskInterface
         }
         $status_old = $gCache->get($xid . '_status');
         return (int)$status_old;
-    }
-
-
-    public function end()
-    {
-
     }
 
 

@@ -21,28 +21,32 @@ class Add extends TaskBase implements TaskInterface
         if (empty($xid)) {
             return true;
         }
-        $server_name = $data['server'];
+        $server_name = strtolower($data['server']);
         $gCache = $this->getGCache();
         $sub = $gCache->get($xid . '_sub');
         $sub[$server_name] = 2;
         $gCache->save($xid . '_sub', $sub);
         # 4 秒没有 处理完成就是失败
         for ($i = 0; $i < 10; $i++) {
-            $create_status = $this->monitor($xid);
-            if ($create_status === 2) {
+            $now_status = $this->monitor2($xid, 2);
+            if ($now_status === 2 || $now_status === -1) {
                 $logger->info(' task-add:成功');
                 break;
             }
             usleep(100000 * $i);
         }
         $logger->info(microtime(true) . ' task-add-return : ' . var_export([
-                $create_status,
+                $now_status,
                 $gCache->get($xid . '_sub')
             ], true));
 
-        return $create_status === 2;
+        return $now_status === 2;
     }
 
+    public function end()
+    {
+
+    }
 
     /**
      * 监测是否创建成功!
@@ -69,11 +73,6 @@ class Add extends TaskBase implements TaskInterface
         }
         $status_old = $gCache->get($xid . '_status');
         return (int)$status_old;
-    }
-
-    public function end()
-    {
-
     }
 
 

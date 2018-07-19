@@ -22,23 +22,27 @@ class End extends TaskBase implements TaskInterface
         if (empty($xid)) {
             return true;
         }
-        $server_name = $data['server_name'];
+        $server_name = strtolower($data['server_name']);
         $gCache = $this->getGCache();
         $sub = $gCache->get($xid . '_sub');
         $sub[$server_name] = 4;
         $gCache->save($xid . '_sub', $sub);
         # 4 秒没有依赖处理完成就是失败
         for ($i = 0; $i < 10; $i++) {
-            $create_status = $this->monitor($xid);
-            if ($create_status === 4) {
+            $create_status = $this->monitor2($xid, 4);
+            if ($create_status === 4 || $create_status === -1) {
                 break;
             }
             usleep(100000 * $i);;
         }
-        $logger->info(microtime(true) . ' task-end-return' . var_export($create_status === 4, true));
+        $logger->info(microtime(true) . ' task-end-return ' . var_export($create_status, true) . var_export($gCache->get($xid . '_sub'), true));
         return $create_status === 4;
     }
 
+    public function end()
+    {
+
+    }
 
     /**
      * 监测是否创建成功!
@@ -65,12 +69,6 @@ class End extends TaskBase implements TaskInterface
         }
         $status_old = $gCache->get($xid . '_status');
         return (int)$status_old;
-    }
-
-
-    public function end()
-    {
-
     }
 
 

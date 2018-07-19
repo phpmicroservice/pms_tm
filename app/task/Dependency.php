@@ -22,15 +22,16 @@ class Dependency extends TaskBase implements TaskInterface
         if (empty($xid)) {
             return true;
         }
-        $server_name = $data['server_name'];
+
+        $server_name = strtolower($data['server_name']);
         $gCache = $this->getGCache();
         $sub = $gCache->get($xid . '_sub');
         $sub[$server_name] = 3;
         $gCache->save($xid . '_sub', $sub);
         # 4 秒没有依赖处理完成就是失败
         for ($i = 0; $i < 10; $i++) {
-            $now_status = $this->monitor($xid);
-            if ($now_status === 3) {
+            $now_status = $this->monitor2($xid, 3);
+            if ($now_status === 3 || $now_status === -1) {
                 break;
             }
             usleep(100000 * $i);
@@ -42,7 +43,10 @@ class Dependency extends TaskBase implements TaskInterface
         return $now_status === 3;
     }
 
+    public function end()
+    {
 
+    }
 
     /**
      * 监测是否创建成功!
@@ -68,12 +72,6 @@ class Dependency extends TaskBase implements TaskInterface
         }
         $status_old = $gCache->get($xid . '_status');
         return (int)$status_old;
-    }
-
-
-    public function end()
-    {
-
     }
 
 

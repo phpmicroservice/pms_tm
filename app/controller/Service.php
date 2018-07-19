@@ -27,7 +27,7 @@ class Service extends \app\Controller
         $server = $this->getData('server');
         $xid = uniqid();
         $this->gCache->save($xid . '_status', 0);
-        $this->gCache->save($xid . '_sub', [$server => 1]);
+        $this->gCache->save($xid . '_sub', [strtolower($server) => 1]);
         $this->connect->send_succee([
             'xid' => $xid
         ]);
@@ -40,10 +40,12 @@ class Service extends \app\Controller
     {
         $xid = $this->getData('xid');
         $name = $this->getData('name');
+        $ems = $this->getData('ems');
         $connect = $this->connect;
         $this->swoole_server->task(['rollback', [
             'xid' => $xid,
-            'name' => $name
+            'name' => $name,
+            'ems' => $ems
         ]], -1, function (\swoole_server $serv, $task_id, $data) use ($connect) {
             if ($data['re']) {
                 $connect->send_succee(true);
@@ -159,6 +161,11 @@ class Service extends \app\Controller
                 'data' => $value['tx_data'],
                 'xid' => $xid
             ];
+
+            $sub = $this->gCache->get($xid . '_sub');
+            $sub[strtolower($value['server'])] = 0;
+            $this->gCache->save($xid . '_sub', $sub);
+
             $this->swoole_server->task(['create', [
                 'xid' => $xid,
                 'data' => $data,
@@ -188,6 +195,13 @@ class Service extends \app\Controller
             }
         });
 
+    }
+
+    public function get_mes()
+    {
+        $xid = $this->getData('xid');
+        $messages = $this->gCache->get($xid . '-message');
+        $this->connect->send_succee($messages);
     }
 
 }

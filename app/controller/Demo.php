@@ -9,7 +9,6 @@ namespace app\controller;
 class Demo extends \pms\Controller
 {
 
-
     /**
      * @param $data
      */
