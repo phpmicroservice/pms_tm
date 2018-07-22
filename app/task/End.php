@@ -28,7 +28,7 @@ class End extends TaskBase implements TaskInterface
         $sub[$server_name] = 4;
         $gCache->save($xid . '_sub', $sub);
         # 4 秒没有依赖处理完成就是失败
-        for ($i = 0; $i < 10; $i++) {
+        for ($i = 0; $i < 12; $i++) {
             $create_status = $this->monitor2($xid, 4);
             if ($create_status === 4 || $create_status === -1) {
                 break;

@@ -50,7 +50,7 @@ class TaskBase extends Task
             $gCache->save($xid . '_status', $status1);
         }
         # 事务回滚
-        if ($status1 == -1) {
+        if ($status1 === -1) {
             $gCache->save($xid . '_status', $status1);
         }
         $status_old = $gCache->get($xid . '_status');
