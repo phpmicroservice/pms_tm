@@ -3,7 +3,6 @@
 namespace app\task;
 
 use pms\bear\ClientSync;
-use pms\Task\Task;
 use pms\Task\TaskInterface;
 
 /**
