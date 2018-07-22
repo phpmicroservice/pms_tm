@@ -19,9 +19,9 @@ class Create extends TaskBase implements TaskInterface
         $gCache = $this->getGCache();
         $logger = $this->getLogger();
         $logger->info(microtime(true) . ' task-create-start' . var_export($this->trueData, true));
-        $data = $this->trueData['data'] ?? $this->trueData[1];
+        $data = $this->getData();
         $xid = $data['xid'];
-        $server = strtolower($data['server']);
+        $server = strtolower($data['server_name']);
         $trdata = $data['data'];
 
         # 创建

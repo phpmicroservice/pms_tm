@@ -40,12 +40,14 @@ class Service extends \app\Controller
     {
         $xid = $this->getData('xid');
         $name = $this->getData('name');
+        $server_name = $this->connect->f;
         $ems = $this->getData('ems');
         $connect = $this->connect;
         $this->swoole_server->task(['rollback', [
             'xid' => $xid,
             'name' => $name,
-            'ems' => $ems
+            'ems' => $ems,
+            'server_name' => $server_name
         ]], -1, function (\swoole_server $serv, $task_id, $data) use ($connect) {
             if ($data['re']) {
                 $connect->send_succee(true);
@@ -61,7 +63,7 @@ class Service extends \app\Controller
     public function prepare()
     {
         $xid = $this->getData('xid');
-        $server_name = $this->getData('server');
+        $server_name = $this->connect->f;
         $connect = $this->connect;
         $this->swoole_server->task(['prepare', [
             'xid' => $xid,
@@ -83,7 +85,7 @@ class Service extends \app\Controller
     public function end()
     {
         $xid = $this->getData('xid');
-        $server_name = $this->getData('server');
+        $server_name = $this->connect->f;
         $connect = $this->connect;
         $this->swoole_server->task(['end', [
             'xid' => $xid,
@@ -105,7 +107,7 @@ class Service extends \app\Controller
     public function commit()
     {
         $xid = $this->getData('xid');
-        $server_name = $this->getData('server');
+        $server_name = $this->connect->f;
         $connect = $this->connect;
         $this->swoole_server->task(['commit', [
             'xid' => $xid,
@@ -126,7 +128,7 @@ class Service extends \app\Controller
     {
         $this->logger->info('controller-add' . var_export($this->getData(), true));
         $xid = $this->getData('xid');
-        $server = $this->getData('server');
+        $server_name = $this->connect->f;
         $data125 = $this->getData('data');
         # 处理依赖
         $this->call_yl($xid, $data125);
@@ -134,7 +136,7 @@ class Service extends \app\Controller
         # 监测依赖处理
         $this->swoole_server->task(['add', [
             'xid' => $xid,
-            'server' => $server,
+            'server_name' => $server_name,
             'data' => $data125
         ]], -1, function (\swoole_server $server, $task_id, $data) use ($connect) {
             if ($data['re']) {
@@ -169,7 +171,7 @@ class Service extends \app\Controller
             $this->swoole_server->task(['create', [
                 'xid' => $xid,
                 'data' => $data,
-                'server' => $value['server']
+                'server_name' => strtolower($value['server'])
             ]], -1, function ($s, $wid, $re) {
                 output($re, '创建task执行结果');
             });
@@ -182,7 +184,8 @@ class Service extends \app\Controller
     public function dependency()
     {
         $xid = $this->getData('xid');
-        $server_name = $this->getData('server');
+
+        $server_name = $this->connect->f;
         $connect = $this->connect;
         $this->swoole_server->task(['dependency', [
             'xid' => $xid,

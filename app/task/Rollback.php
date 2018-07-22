@@ -15,7 +15,7 @@ class Rollback extends TaskBase implements TaskInterface
     public function run()
     {
         $data = $this->trueData['data']??$this->trueData[1];
-        $server_name = strtolower($data['name']);
+        $server_name = strtolower($data['server_name']);
         $xid = $data['xid'];
 
 

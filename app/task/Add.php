@@ -21,7 +21,7 @@ class Add extends TaskBase implements TaskInterface
         if (empty($xid)) {
             return true;
         }
-        $server_name = strtolower($data['server']);
+        $server_name = strtolower($data['server_name']);
         $gCache = $this->getGCache();
         $sub = $gCache->get($xid . '_sub');
         $sub[$server_name] = 2;
