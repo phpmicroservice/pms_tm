@@ -8,7 +8,6 @@ class TaskBase extends Task
 {
 
 
-
     protected function getLogger(): \Phalcon\Logger\AdapterInterface
     {
         $data = $this->trueData['data']??$this->trueData[1];
@@ -34,15 +33,17 @@ class TaskBase extends Task
         # 判断其他的 服务依赖是否完成
         $status1 = $newstatus1;
         foreach ($sub as $name => $status) {
-            if ($status >= $newstatus1) {
-                # 已经进入到构建阶段
-            } else {
-                $status1 = $newstatus1 - 1;
-            }
-            if ($status == -1) {
+            if ($status === -1) {
                 $status1 = -1;
                 break;
             }
+            if ($status >= $newstatus1) {
+                # 已经进入下一个
+                $status1 = $newstatus1;
+            } else {
+                $status1 = $newstatus1 - 1;
+            }
+
         }
         # 已经完成就保存  事务状态信息
         if ($status1 === $newstatus1) {
