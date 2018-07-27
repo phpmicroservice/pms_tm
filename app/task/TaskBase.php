@@ -39,7 +39,6 @@ class TaskBase extends Task
             }
             if ($status >= $newstatus1) {
                 # 已经进入下一个
-                $status1 = $newstatus1;
             } else {
                 $status1 = $newstatus1 - 1;
             }

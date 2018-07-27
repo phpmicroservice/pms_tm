@@ -14,6 +14,7 @@ class Rollback extends TaskBase implements TaskInterface
 {
     public function run()
     {
+        $logger=$this->getLogger();
         $data = $this->trueData['data']??$this->trueData[1];
         $server_name = strtolower($data['server_name']);
         $xid = $data['xid'];
@@ -29,6 +30,7 @@ class Rollback extends TaskBase implements TaskInterface
         $sub = $gCache->get($xid . '_sub');
         $sub[$server_name] = -1;
         $gCache->save($xid . '_sub', $sub);
+        $logger->info(microtime(true) . ' task-prepare-return' . var_export([$server_name, $gCache->get($xid . '_sub')], true));
         return false;
     }
 
