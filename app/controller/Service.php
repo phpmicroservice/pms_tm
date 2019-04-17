@@ -173,7 +173,7 @@ class Service extends \app\Controller
                 'data' => $data,
                 'server_name' => strtolower($value['server'])
             ]], -1, function ($s, $wid, $re) {
-                output($re, '创建task执行结果');
+                \pms\output($re, '创建task执行结果');
             });
         }
     }

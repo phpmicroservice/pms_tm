@@ -44,8 +44,8 @@ class Alc extends Base
 
         return true;
         $key = $dispatcher->connect->accessKey ?? '';
-        output([APP_SECRET_KEY, $dispatcher->connect->getData(), $dispatcher->connect->f], 'verify_access');
-        if (!verify_access($key, APP_SECRET_KEY, $dispatcher->connect->getData(), $dispatcher->connect->f)) {
+        \pms\output([APP_SECRET_KEY, $dispatcher->connect->getData(), $dispatcher->connect->f], 'verify_access');
+        if (!\pms\verify_access($key, APP_SECRET_KEY, $dispatcher->connect->getData(), $dispatcher->connect->f)) {
             $dispatcher->connect->send_error('accessKey-error', [], 412);
             return false;
         }
